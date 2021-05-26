@@ -78,7 +78,7 @@ res = calls.map((call, idx) => {
             inst = new MKAverage(args[idx][0], args[idx][1]);
             return undefined;
         default:
-            return (inst[call] as () => number).apply(inst, args[idx]);
+            return (inst[call] as (_: any) => number).apply(inst, args[idx] as any);
     }
 });
 
