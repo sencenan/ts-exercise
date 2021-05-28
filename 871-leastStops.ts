@@ -9,63 +9,59 @@ interface MaxHeap<T> {
     data:() => T[];
 }
 
-const maxHeap = <T>(cmp: comparator<T>): MaxHeap<T> => {
-    const arr: T[] = [];
+const maxHeap = <T>(compare: comparator<T>): MaxHeap<T> => {
+    const
+        arr: T[] = [],
+        swap = (i: number, j: number) => {
+            const tmp: T = arr[i];
+            arr[i] = arr[j];
+            arr[j] = tmp;
+        },
+        cmp = (i: number, j: number): number => compare(arr[i], arr[j]),
+        parent = (i: number) => Math.floor((i - 1) / 2),
+        children = (i: number) => [i * 2 + 1, i * 2 + 2],
+        bubbleUp = (i: number) => {
+            for (
+                let p = parent(i);
+                i > 0 && cmp(i, p) > 0;
+                i = p, p = parent(p)
+            ) {
+                swap(i, p);
+            }
+        },
+        dropDown = (i: number) => {
+            if (i <= parent(arr.length - 1)) {
+                const
+                    [l, r] = children(i),
+                    il = cmp(i, l),
+                    ir = r < arr.length ? cmp(i, r) : Infinity;
+
+                if (il < 0 || ir < 0) {
+                    if (r < arr.length && cmp(l, r) < 0) {
+                        swap(r, i);
+                        dropDown(r);
+                    } else {
+                        swap(l, i);
+                        dropDown(l);
+                    }
+                }
+            }
+        };
 
     const heap = {
 
         insert: (n: T) => {
             arr.push(n);
-
-            for (
-                let i = arr.length - 1, p = Math.floor((i - 1) / 2);
-                i > 0 && cmp(arr[i], arr[p]) > 0;
-                i = p, p = Math.floor((i - 1) / 2)
-            ) {
-                const tmp = arr[i];
-                arr[i] = arr[p];
-                arr[p] = tmp;
-            }
+            bubbleUp(arr.length - 1);
         },
 
         deleteMax: () => {
-            if (arr.length === 0) {
-                return undefined;
-            }
-
-            const max = arr.shift();
+            const max = arr[0];
 
             if (arr.length > 0) {
-                arr.unshift(arr.pop() as T);
-
-                let i = 0;
-                while (i * 2 + 1 < arr.length) {
-                    const
-                        l = i * 2 + 1,
-                        r = l + 1;
-
-                    let maxIdx = r;
-
-                    if (r >= arr.length || cmp(arr[l], arr[r]) > 0) {
-                        maxIdx = l;
-                    }
-
-                    const tmp = arr[i];
-                    arr[i] = arr[maxIdx];
-                    arr[maxIdx] = tmp;
-
-                    i = maxIdx;
-                }
-
-                for (
-                    let i = 0, f = 2 * i + 1;
-                    f < arr.length && cmp(arr[i], arr[f]) < 0;
-                    i = f, f = 2 * i + 1
-                ) {
-                    const tmp = arr[i];
-                    arr[i] = arr[f];
-                    arr[f] = tmp;
-                }
+                swap(0, arr.length - 1);
+                arr.pop();
+                dropDown(0);
             }
 
             return max;
@@ -78,6 +74,8 @@ const maxHeap = <T>(cmp: comparator<T>): MaxHeap<T> => {
 
     return heap;
 };
+
+//
 
 function minRefuelStops(target: number, startFuel: number, stations: number[][]): number {
     let
@@ -104,20 +102,6 @@ function minRefuelStops(target: number, startFuel: number, stations: number[][])
 };
 
 //
-
-// const heap: MaxHeap<number> = maxHeap((a, b) => a - b);
-// heap.insert(3);
-// heap.insert(5);
-// heap.insert(6);
-// heap.insert(10);
-// heap.insert(7);
-// console.log(heap.deleteMax(), heap.data());
-// console.log(heap.deleteMax(), heap.data());
-// console.log(heap.deleteMax(), heap.data());
-// console.log(heap.deleteMax(), heap.data());
-// console.log(heap.deleteMax(), heap.data());
-// console.log(heap.deleteMax(), heap.data());
-// console.log(heap.data().length);
 
 let t: number, f: number, s: number[][];
 
