@@ -1,21 +1,23 @@
 namespace Q665 {
 
     function checkPossibility(nums: number[]): boolean {
-        let nNega = 0;
+        let changedCnt = 0;
 
-        for (let i = 1; i < nums.length; i += 1) {
-            const diff = nums[i] - nums[i - 1];
+        for (let i = 1; i < nums.length && changedCnt < 2; i += 1) {
+            if (nums[i - 1] > nums[i]) {
+                changedCnt += 1;
 
-            if (diff < 0) {
-                nNega += 1;
-            }
-
-            if (nNega > 1) {
-                return false;
+                if (i - 2 < 0 || nums[i - 2] <= nums[i]) {
+                    // option 1/2: decrease lhs to be the same as rhs
+                    nums[i - 1] = nums[i];
+                } else {
+                    // option 2/2: increase rhs to be the same as lhs
+                    nums[i] = nums[i - 1];
+                }
             }
         }
 
-        return nNega <= 1;
+        return changedCnt < 2;
     };
 
 }
