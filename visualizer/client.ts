@@ -1,8 +1,9 @@
 type Update = ['reset', number, number, CellState[][]]
     | ['visit', number, number]
+    | ['label', number, number, string]
     | ['backtrack'];
 
-const onLoad = (cellSize: number, port: number = 9191) => {
+const onLoad = (cellSize: number, port: number = 9191, delay = 66) => {
     const
         opts = { cellSize },
         queue: Update[] = [];
@@ -12,25 +13,30 @@ const onLoad = (cellSize: number, port: number = 9191) => {
         updater: (() => void) | null = null;
 
     const loop = () => {
-        if (queue.length === 0) { return; }
+        if (queue.length > 0) {
+            const update = queue.shift() as Update;
 
-        const update = queue.shift() as Update;
+            switch (update[0]) {
+                case 'reset':
+                    [grid, updater] = reset(update[1], update[2], update[3], opts);
+                    break;
+                case 'visit':
+                    grid?.visit(update[1], update[2]);
+                    break;
+                case 'label':
+                    grid?.setLabel([update[1], update[2]], update[3]);
+                    break;
+                case 'backtrack':
+                    grid?.backtrack();
+                    break;
+            }
 
-        switch (update[0]) {
-            case 'reset':
-                [grid, updater] = reset(update[1], update[2], update[3], opts);
-                break;
-            case 'visit':
-                grid?.visit(update[1], update[2]);
-                break;
-            case 'backtrack':
-                grid?.backtrack();
-                break;
+            updater && updater();
         }
 
-        updater && updater();
-        requestAnimationFrame(loop);
+        setTimeout(() => requestAnimationFrame(loop), delay);
     };
+    loop();
 
     const socket = new WebSocket(`ws://localhost:${port}`);
 
@@ -41,7 +47,6 @@ const onLoad = (cellSize: number, port: number = 9191) => {
     // Listen for messages
     socket.addEventListener('message', function(event) {
         queue.push(JSON.parse(event.data));
-        loop();
     });
 };
 

@@ -12,19 +12,24 @@ interface Grid {
     readonly width: number;
     readonly height: number;
     readonly cells: CellState[][];
+    readonly labels: string[][];
     readonly traversal: Pos[];
 
     visit(r: number, c: number): Grid;
     backtrack(): Grid;
     setState(pos: Pos, state: CellState): Grid;
+    setLabel(pos: Pos, label: string): Grid;
 }
 
-const makeGrid = (width: number, height: number): Grid => {
+const makeGrid = (height: number, width: number): Grid => {
     const grid: Grid = {
         width,
         height,
         cells: new Array(height).fill(0).map(
             _ => new Array<CellState>(width).fill(CellState.EMPTY)
+        ),
+        labels: new Array(height).fill(0).map(
+            _ => new Array<string>(width).fill('')
         ),
         traversal: [],
 
@@ -72,6 +77,11 @@ const makeGrid = (width: number, height: number): Grid => {
 
         setState: ([r, c], state) => {
             grid.cells[r][c] = state;
+            return grid;
+        },
+
+        setLabel: ([r, c], label) => {
+            grid.labels[r][c] = label;
             return grid;
         }
     };

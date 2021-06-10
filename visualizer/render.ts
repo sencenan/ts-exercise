@@ -20,6 +20,7 @@ const renderGrid = (canvas: HTMLCanvasElement, grid: Grid, partialOpts: Partial<
     drawHorizontalMarker(ctx, grid, opts);
     drawCells(ctx, grid, opts);
     drawPaths(ctx, grid, opts);
+    drawLabels(ctx, grid, opts);
 };
 
 const getCellPos = (r: number, c: number, opts: RenderOptions): Pos => [
@@ -58,6 +59,28 @@ const drawPaths = (ctx: CanvasRenderingContext2D, grid: Grid, opts: RenderOption
     });
     ctx.restore();
 };
+
+const drawLabels = (ctx: CanvasRenderingContext2D, grid: Grid, opts: RenderOptions): void => {
+    ctx.save();
+
+    for (let r = 0; r < grid.height; r += 1) {
+        for (let c = -1; c < grid.width; c += 1) {
+            const [y, x] = getCellPos(r, c, opts);
+
+            if (grid.labels[r][c]) {
+                ctx.textAlign = "center";
+                ctx.fillText(
+                    grid.labels[r][c],
+                    x + opts.cellSize / 2,
+                    y + opts.cellSize / 2 + opts.markerHeight / 2,
+                    opts.cellSize
+                );
+            }
+        }
+    }
+
+    ctx.restore();
+}
 
 const drawCells = (ctx: CanvasRenderingContext2D, grid: Grid, opts: RenderOptions): void => {
     for (let r = 0; r < grid.height; r += 1) {
