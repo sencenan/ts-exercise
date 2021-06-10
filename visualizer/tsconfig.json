@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "types": ["node"],
+        "module": "none",
+        "lib": ["dom"],
+        "strict": true,
+        "outFile": "./dist/script.js"
+    }
+}
