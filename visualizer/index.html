@@ -13,7 +13,11 @@
         <script src="dist/script.js"></script>
 
         <script>
-            onLoad(parseInt(/\?size=(\d+)/.exec(location.search)[1], 10) || undefined);
+            const
+                cellSize = parseInt(/size=(\d+)/.exec(location.search)[1], 10) || undefined,
+                port = parseInt(/port=(\d+)/.exec(location.search)[1], 10) || undefined;
+
+            onLoad(cellSize, port);
         </script>
     </body>
 

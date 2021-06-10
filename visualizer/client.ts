@@ -2,14 +2,14 @@ type Update = ['reset', number, number, CellState[][]]
     | ['visit', number, number]
     | ['backtrack'];
 
-const onLoad = (cellSize: number) => {
+const onLoad = (cellSize: number, port: number = 9191) => {
     const
         opts = { cellSize },
         queue: Update[] = [];
 
     let
-        grid: Grid,
-        updater: () => void;
+        grid: Grid | null = null,
+        updater: (() => void) | null = null;
 
     const loop = () => {
         if (queue.length === 0) { return; }
@@ -21,52 +21,28 @@ const onLoad = (cellSize: number) => {
                 [grid, updater] = reset(update[1], update[2], update[3], opts);
                 break;
             case 'visit':
-                grid.visit(update[1], update[2]);
+                grid?.visit(update[1], update[2]);
                 break;
             case 'backtrack':
-                grid.backtrack();
+                grid?.backtrack();
                 break;
         }
 
-        updater();
+        updater && updater();
         requestAnimationFrame(loop);
     };
 
-    const
-        rate = 300,
-        inp: Update[] = [
-            ['reset', 20, 20, []],
-            ['visit', 0, 0],
-            ['visit', 0, 1],
-            ['visit', 0, 2],
-            ['visit', 1, 2],
-            ['visit', 1, 3],
-            ['backtrack'],
-            ['backtrack'],
-            ['backtrack'],
-            ['visit', 1, 1],
-            ['visit', 2, 1],
-            ['reset', 10, 10, []],
-            ['visit', 0, 0],
-            ['visit', 0, 1],
-            ['visit', 0, 2],
-            ['visit', 1, 2],
-            ['visit', 1, 3],
-            ['backtrack'],
-            ['backtrack'],
-            ['backtrack'],
-            ['visit', 1, 1],
-            ['visit', 2, 1]
-        ];
+    const socket = new WebSocket(`ws://localhost:${port}`);
 
-    const id = setInterval(() => {
-        if (inp.length === 0) {
-            clearInterval(id);
-        } else {
-            queue.push(inp.shift() as Update);
-            loop();
-        }
-    }, rate);
+    socket.addEventListener('open', function() {
+        socket.send('ready');
+    });
+
+    // Listen for messages
+    socket.addEventListener('message', function(event) {
+        queue.push(JSON.parse(event.data));
+        loop();
+    });
 };
 
 const reset = (h: number, w: number, states: CellState[][], opts: Partial<RenderOptions>): [Grid, () => void] => {

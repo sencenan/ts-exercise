@@ -32,10 +32,13 @@ const makeGrid = (width: number, height: number): Grid => {
             const pos: Pos = [r, c];
 
             if (grid.traversal.length > 0) {
-                grid.setState(
-                    grid.traversal[grid.traversal.length - 1],
-                    CellState.VISITING
-                );
+                const last = grid.traversal[grid.traversal.length - 1];
+
+                if (last[0] === r && last[1] === c) {
+                    return grid;
+                }
+
+                grid.setState(last, CellState.VISITING);
             }
 
             grid.traversal.push(pos);
