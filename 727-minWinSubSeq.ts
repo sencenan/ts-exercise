@@ -1,5 +1,6 @@
 namespace MinWindowSubSeq727 {
 
+    // this can not be right....
     function minWindow(s1: string, s2: string): string {
         let
             left = 0,
