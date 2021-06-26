@@ -30,7 +30,7 @@ namespace NumMatchingSubSeq792 {
         Array.from(s).forEach(
             c => {
                 if (dict[c] !== undefined) {
-                    const ws = dict[c];
+                    const ws = dict[c] as Set<string>;
                     delete dict[c];
 
                     for (const w of ws) {
