@@ -3,9 +3,12 @@
     "ts-node": {
         "transpileOnly": true,
         "files": true,
-        "compilerOptions": {}
+        "compilerOptions": {
+        }
     },
     "compilerOptions": {
-        "strict": true
+        "strict": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
     }
 }
